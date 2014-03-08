@@ -1,0 +1,69 @@
+///////////////////////////////////////////////////////////////////////////////
+// setParameters.hoc: sets all the user adjustable parameters for the model
+///////////////////////////////////////////////////////////////////////////////
+
+// Global parameters
+v_init          = -68   // mV
+tstop           = 45000 // ms
+dt              = 0.025 // ms
+celsius         = 36    // C degrees
+cli0_cl_ion     = 2     // mM
+clo0_cl_ion     = 125   // mM
+hco3i0_hco3_ion = 10    // mM
+hco3o0_hco3_ion = 25    // mM
+cai0_ca_ion     = 10e-6 // mM
+cao0_ca_ion     = 4     // mM
+
+// hh parameters
+gnabar = 0.120
+gkbar  = 0.036
+gl     = 0.0003
+el     = -65
+
+// Soma parameters
+diameter  = 10  // um
+length    = 10  // um
+axial_res = 100 // ohm cm
+
+// CClamp parameters
+duration  = 1   // ms
+amplitude = 0.5 // nA
+
+// GABAa parameters
+clprm      = 1.0   //         (chloride permeability)
+gaba_C     = 1     // mM      (max transmitter concentration)
+gaba_D     = 1     // ms      (transmitter duration (rising phase))
+gaba_alpha = 1     // 1/ms mM (forward (binding) rate)
+gaba_beta  = 0.18  // 1/ms    (backward (unbinding) rate)
+gaba_gmax  = 0.001 // uS      (maximum synaptic conductance)
+
+// NetStim parameters
+interval_pre = 200 // ms
+number_pre   = 0
+start_pre    = 15005 // ms
+noise_pre    = 0
+
+interval_post = 200 // ms
+number_post   = 0
+start_post    = 15000 // ms
+noise_post    = 0
+
+// KCC2 parameters
+A_M  = 0.5    // 1/s (rate of transfer from cytosolic to membrane-bound KCC2)
+B_M  = 5      // 1/s (rate of transfer from membrane-bound to cytosolic KCC2)
+R_M  = 10     // 1/s (KCC2 dephosphorylation coefficient)
+R_MP = 2      // 1/s (KCC2 phosphorylation coefficient)
+R_K  = 100e-6 // mM  (concentration of calcium at which kinase activation rate is at half max)
+R_P  = 200e-6 // mM  (concentration of calcium at which phosphotase activation rate is at half max)
+V_K  = 1      // 1/s (maximum rate of kinase activation)
+V_P  = 1      // 1/s (maximum rate of phosphotase activation)
+H_K  = 2      //     (Hill coefficient for kinase activation equation)
+H_P  = 2      //     (Hill coefficient for phosphotase activation equation)
+B_K  = 1      // 1/s (rate of kinase inactivation)
+B_P  = 1      // 1/s (rate of phosphotase inactivation)
+
+// KCC2_Transport parameters
+axD    = 1    // um2/ms (axial chloride diffusion constant)
+gtonic = 0    // S/cm2  (tonic conductance)
+R_T    = 5    // mM     (Michaelis constant for KCC2 ion transport)
+r_T    = 50   // 1/s    (rate of transport of KCC2-bound ions across the membrane)

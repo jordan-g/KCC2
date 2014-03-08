@@ -1,0 +1,93 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeCell.hoc: script to build the cell
+///////////////////////////////////////////////////////////////////////////////
+
+// Create the soma
+create soma
+access soma
+nseg = 1
+diam = diameter
+L    = length
+Ra   = axial_res
+
+// Insert Hodgkin-Huxley dynamics
+insert hh
+gnabar_hh = gnabar
+gkbar_hh  = gkbar
+gl_hh     = gl
+el_hh     = el
+
+// Insert IClamp & set parameters
+objref cclamp
+cclamp     = new CClamp(0.5)
+cclamp.dur = duration
+cclamp.amp = amplitude
+
+// Insert GABAa synapse & set parameters
+objref gaba
+gaba        = new GABAa(0.5)
+clprm_GABAa = clprm
+C_GABAa     = gaba_C
+D_GABAa     = gaba_D
+alpha_GABAa = gaba_alpha
+beta_GABAa  = gaba_beta
+gmax_GABAa  = gaba_gmax
+
+// Insert T-type & L-type Ca2+ channels
+insert cal
+insert cat2
+insert cad
+
+// Insert pre-synaptic and post-synaptic stimuli
+objref stim_pre
+stim_pre          = new NetStim(0.5)
+stim_pre.interval = interval_pre
+stim_pre.number   = number_pre
+stim_pre.start    = start_pre
+stim_pre.noise    = noise_pre
+
+objref stim_post
+stim_post          = new NetStim(0.5)
+stim_post.interval = interval_post
+stim_post.number   = number_post
+stim_post.start    = start_post
+stim_post.noise    = noise_post
+
+objref netcon_pre
+netcon_pre = new NetCon(stim_pre, gaba, 0, 0, 1)
+
+objref netcon_post
+netcon_post = new NetCon(stim_post, cclamp, 0, 0, 1)
+
+// Create KCC2 and KCC2_Transport
+insert KCC2
+insert KCC2_Transport
+
+// Set KCC2 parameters
+A_M_KCC2  = A_M
+B_M_KCC2  = B_M
+R_M_KCC2  = R_M
+R_MP_KCC2 = R_MP
+R_K_KCC2  = R_K
+R_P_KCC2  = R_P
+V_K_KCC2  = V_K
+V_P_KCC2  = V_P
+H_K_KCC2  = H_K
+H_P_KCC2  = H_P
+B_K_KCC2  = B_K
+B_P_KCC2  = B_P
+
+// Set KCC2_Transport parameters
+axD_KCC2_Transport    = axD
+gtonic_KCC2_Transport = gtonic
+R_T_KCC2_Transport    = R_T
+r_T_KCC2_Transport    = r_T
+
+// register ions with NEURON
+catype   = ion_register("ca", 2)
+cltype   = ion_register("cl",-1)
+hco3type = ion_register("hco3",-1)
+
+// set styles for the ions
+castyle = ion_style("ca_ion", 1, 0, 0, 0, 1)
+clstyle = ion_style("cl_ion", 3, 2, 1, 1, 1)

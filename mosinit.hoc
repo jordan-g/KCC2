@@ -1,0 +1,24 @@
+///////////////////////////////////////////////////////////////////////////////
+// mosinit.hoc: this is the high-level script; to run the simulation type
+//              'nrngui mosinit.hoc' at the command 
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////// load nrngui //////////////////////////////////////////////
+load_file("nrngui.hoc")
+
+//////////////////// model and interface scripts //////////////////////////////
+xopen("setParameters.hoc")
+xopen("makeCell.hoc")
+xopen("makeWindows.hoc")
+
+//////////////////// procedure definitions ////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// init()
+//-----------------------------------------------------------------------------
+// the initialization procedure for the numerical integrator
+
+proc init() {
+  finitialize(v_init)
+  frecord_init()
+}

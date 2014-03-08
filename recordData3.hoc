@@ -1,0 +1,60 @@
+///////////////////////////////////////////////////////////////////////////////
+// recordData.hoc: this script can be used to record from the simulation
+///////////////////////////////////////////////////////////////////////////////
+
+xopen("mosinit.hoc")
+
+//-----------------------------------------------------------------------------
+// user parameters
+
+// the directory to put the files in and the prefix for the files
+strdef outdir, fname
+outdir = "./data/3"
+fname  = "data"
+
+// the sampling frequency for recording (in Hz)
+rsamp = 2000
+rstep = 1/(rsamp/1000)      // don't change this, it is the time per sample
+nstep = tstop*(rsamp/1000)  // don't change this, it is the number of samples per run
+
+//-----------------------------------------------------------------------------
+// declare the vector to store the data
+
+objref mkcc2_percent
+
+mkcc2_percent = new Vector(nstep)
+
+//-----------------------------------------------------------------------------
+// run the simulation
+strdef filename
+objref runfile
+
+// create a File object
+runfile = new File()
+
+// loop over cai values from 1 to 10
+for i = 1, 10 {
+    // open the file for writing
+    sprint(filename,"%s/%s_%d.dat", outdir, fname, i)
+    runfile.wopen(filename)
+  
+    print "---------- cai: ", (50e-6)*(1 + i), "mM --------------------"
+  
+    // loop over R_M and R_MP values from 1 to 10
+    for j = 1, 10 {
+        for k = 1, 10 {
+            // record & write mkcc2i values for each permutation of cai, R_M and R_MP
+            mkcc2_percent.record(&mkcc2i(0.5), rstep)
+            init()
+            cai0_ca_ion = (50e-6)*(1 + i)
+            R_M_KCC2    = j
+            R_MP_KCC2   = k
+            run()
+            mkcc2_percent.vwrite(runfile)
+
+            // print the final mkcc2i value for each run
+            print "R_M: ", j, " R_MP: ", k, " mkcc2: ", mkcc2_percent.x[mkcc2_percent.size()-1]
+        }
+    }
+    runfile.close()
+}
