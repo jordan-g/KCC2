@@ -10,84 +10,129 @@ diam = diameter
 L    = length
 Ra   = axial_res
 
-// Insert Hodgkin-Huxley dynamics
-insert hh
-gnabar_hh = gnabar
-gkbar_hh  = gkbar
-gl_hh     = gl
-el_hh     = el
+// Register ions with NEURON
+catype   = ion_register("ca", 2)
+cltype   = ion_register("cl", -1)
+hco3type = ion_register("hco3", -1)
 
-// Insert IClamp & set parameters
-objref cclamp
-cclamp     = new CClamp(0.5)
-cclamp.dur = duration
-cclamp.amp = amplitude
+// Set styles for the ions
+castyle = ion_style("ca_ion", 3, 1, 0, 0, 1)
+clstyle = ion_style("cl_ion", 3, 2, 1, 1, 1)
+hco3style = ion_style("hco3_ion", 1, 2, 1, 0, 1)
 
-// Insert GABAa synapse & set parameters
-objref gaba
-gaba        = new GABAa(0.5)
-clprm_GABAa = clprm
-C_GABAa     = gaba_C
-D_GABAa     = gaba_D
-alpha_GABAa = gaba_alpha
-beta_GABAa  = gaba_beta
-gmax_GABAa  = gaba_gmax
+// Create vectors containing set mechanism control parameters
+objref distributed_mech_params
+distributed_mech_params = new Vector()
+distributed_mech_params.append(use_hh)
+distributed_mech_params.append(use_ca_channels)
+distributed_mech_params.append(use_ca_channels)
+distributed_mech_params.append(use_ca_channels)
+distributed_mech_params.append(use_kcc2)
+distributed_mech_params.append(use_kcc2_transport)
 
-// Insert T-type & L-type Ca2+ channels
-insert cal
-insert cat2
-insert cad
+objref point_mech_params
+point_mech_params = new Vector()
+point_mech_params.append(use_cclamp)
+point_mech_params.append(use_gaba)
+
+// Initialize MechanismType objects
+// These are lists of all available distributed & point-process mechanisms
+objref dmt, pmt
+dmt = new MechanismType(0)
+pmt = new MechanismType(1)
+
+// Insert CClamp and GABAa synapse
+objref cclamp, gaba
+for i = 0, point_mech_params.size()-1 {
+	ref = point_mech_params.x(i)
+	if (ref == 1) {
+		if (i == 0) {
+			pmt.select("CClamp")
+			pmt.make(cclamp)
+			cclamp.loc(0.5)
+			cclamp.dur = duration
+			cclamp.amp = amplitude
+		}
+		if (i == 1) {
+			pmt.select("GABAa")
+			pmt.make(gaba)
+			gaba.loc(0.5)
+			clprm_GABAa = clprm
+			C_GABAa     = gaba_C
+			D_GABAa     = gaba_D
+			alpha_GABAa = gaba_alpha
+			beta_GABAa  = gaba_beta
+			gmax_GABAa  = gaba_gmax
+		}
+	}
+}
 
 // Insert pre-synaptic and post-synaptic stimuli
-objref stim_pre
-stim_pre          = new NetStim(0.5)
-stim_pre.interval = interval_pre
-stim_pre.number   = number_pre
-stim_pre.start    = start_pre
-stim_pre.noise    = noise_pre
+objref stim_pre, stim_post, netcon_pre, netcon_post
+if (apply_stim_protocol == 1 && use_cclamp == 1 && use_gaba == 1) {
+	stim_pre          = new NetStim(0.5)
+	stim_pre.interval = interval_pre
+	stim_pre.number   = number_pre
+	stim_pre.start    = start_pre
+	stim_pre.noise    = noise_pre
 
-objref stim_post
-stim_post          = new NetStim(0.5)
-stim_post.interval = interval_post
-stim_post.number   = number_post
-stim_post.start    = start_post
-stim_post.noise    = noise_post
+	stim_post          = new NetStim(0.5)
+	stim_post.interval = interval_post
+	stim_post.number   = number_post
+	stim_post.start    = start_post
+	stim_post.noise    = noise_post
 
-objref netcon_pre
-netcon_pre = new NetCon(stim_pre, gaba, 0, 0, 1)
+	netcon_pre = new NetCon(stim_pre, gaba, 0, 0, 1)
+	netcon_post = new NetCon(stim_post, cclamp, 0, 0, 1)
+}
 
-objref netcon_post
-netcon_post = new NetCon(stim_post, cclamp, 0, 0, 1)
-
-// Create KCC2 and KCC2_Transport
-insert KCC2
-insert KCC2_Transport
-
-// Set KCC2 parameters
-A_M_KCC2  = A_M
-B_M_KCC2  = B_M
-R_M_KCC2  = R_M
-R_MP_KCC2 = R_MP
-R_K_KCC2  = R_K
-R_P_KCC2  = R_P
-V_K_KCC2  = V_K
-V_P_KCC2  = V_P
-H_K_KCC2  = H_K
-H_P_KCC2  = H_P
-B_K_KCC2  = B_K
-B_P_KCC2  = B_P
-
-// Set KCC2_Transport parameters
-axD_KCC2_Transport    = axD
-gtonic_KCC2_Transport = gtonic
-R_T_KCC2_Transport    = R_T
-r_T_KCC2_Transport    = r_T
-
-// register ions with NEURON
-catype   = ion_register("ca", 2)
-cltype   = ion_register("cl",-1)
-hco3type = ion_register("hco3",-1)
-
-// set styles for the ions
-castyle = ion_style("ca_ion", 1, 0, 0, 0, 1)
-clstyle = ion_style("cl_ion", 3, 2, 1, 1, 1)
+// Insert distributed mechanisms
+for i = 0, distributed_mech_params.size()-1 {
+	ref = distributed_mech_params.x(i)
+	if (ref == 1) {
+		if (i == 0) {
+			dmt.select("hh")
+			dmt.make()
+			gnabar_hh = gnabar
+			gkbar_hh  = gkbar
+			gl_hh     = gl
+			el_hh     = el
+		}
+		if (i == 1) {
+			dmt.select("cad")
+			dmt.make()
+		}
+		if (i == 2) {
+			dmt.select("cal")
+			dmt.make()
+		}
+		if (i == 3) {
+			dmt.select("cat2")
+			dmt.make()
+		}
+		if (i == 4) {
+			dmt.select("KCC2")
+			dmt.make()
+			A_M_KCC2  = A_M
+			B_M_KCC2  = B_M
+			R_M_KCC2  = R_M
+			R_MP_KCC2 = R_MP
+			R_K_KCC2  = R_K
+			R_P_KCC2  = R_P
+			V_K_KCC2  = V_K
+			V_P_KCC2  = V_P
+			H_K_KCC2  = H_K
+			H_P_KCC2  = H_P
+			B_K_KCC2  = B_K
+			B_P_KCC2  = B_P
+		}
+		if (i == 5) {
+			dmt.select("KCC2_Transport")
+			dmt.make()
+			axD_KCC2_Transport    = axD
+			gtonic_KCC2_Transport = gtonic
+			R_T_KCC2_Transport    = R_T
+			r_T_KCC2_Transport    = r_T
+		}
+	}
+}

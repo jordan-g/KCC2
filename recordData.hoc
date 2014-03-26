@@ -1,0 +1,89 @@
+///////////////////////////////////////////////////////////////////////////////
+// recordData.hoc: This script is used to record data from simulations
+///////////////////////////////////////////////////////////////////////////////
+
+record = 1
+strdef experiment
+experiment = "1c"
+
+// Set simulation mechanism switches based on selected experiment
+if (strcmp(experiment, "1c") == 0) {
+    use_hh = 0
+    use_cclamp = 0
+    use_gaba = 0
+    use_ca_channels = 0
+    apply_stim_protocol = 0
+    use_kcc2 = 0
+    use_kcc2_transport = 1
+}
+if (strcmp(experiment, "2a") == 0) {
+    use_hh = 0
+    use_cclamp = 1
+    use_gaba = 1
+    use_ca_channels = 1
+    apply_stim_protocol = 1
+    use_kcc2 = 1
+    use_kcc2_transport = 1
+}
+
+xopen("mosinit.hoc")
+
+rsamp = 2000                  // Sampling frequency for recording (in Hz)
+rstep = 1/(rsamp/1000)        // Time per sample
+nstep = tstop*(rsamp/1000)    // Number of samples per run
+
+strdef outdir, fname
+strdef filename
+objref runfile
+
+// Run simulation according to selected experiment
+objref cli_vec, ecl_vec
+if (strcmp(experiment, "1c") == 0) {
+    // 1c. cli and ecl vs. t for different mkcc2 values
+    outdir = "./data/1c"
+    fname = "data"
+
+    cli_vec = new Vector(nstep)
+    ecl_vec = new Vector(nstep)
+
+    // Create a File object
+    runfile = new File()
+
+    for i = 1, 10 {
+        mkcc2_value = 0.05*i
+
+        // Open the file for writing
+        sprint(filename,"%s/%s_%.2f.dat", outdir, fname, mkcc2_value)
+        runfile.wopen(filename)
+        cli_vec.record(&cli(0.5), rstep)
+        ecl_vec.record(&ecl(0.5), rstep)
+        init()
+        mkcc2i = mkcc2_value
+        run()
+        cli_vec.vwrite(runfile)
+        ecl_vec.vwrite(runfile)
+        // Print the final cli and ecl values for each value of mkcc2
+        print "mkcc2: ", mkcc2_value, "final cli: ", cli_vec.x[cli_vec.size()-1], " final ecl: ", ecl_vec.x[ecl_vec.size()-1]
+        runfile.close()
+    }
+}
+if (strcmp(experiment, "2a") == 0) {
+    // 2a. voltage vs. t for some value of egaba, for pre-post and post-pre
+    outdir = "./data/2a"
+    fname = "data"
+
+    v_vec = new Vector(nstep)
+
+    // Create a File object
+    runfile = new File()
+
+    cli_value = 2
+
+    // Open the file for writing
+    sprint(filename, "%s/%s_%.2f_pre-post.dat", outdir, fname, cli_value)
+    runfile.wopen(filename)
+    v_vec.record(&v(0.5), rstep)
+    init()
+    cli0_cl_ion = cli_value
+    run()
+}

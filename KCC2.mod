@@ -50,10 +50,10 @@ STATE {
 }
 
 INITIAL {
-  kin_active    = .5
-  kin_inactive  = .5
-  phos_active   = .5
-  phos_inactive = .5
+  kin_active    = .7
+  kin_inactive  = .3
+  phos_active   = .7
+  phos_inactive = .3
   cyt           = .9
   memb          = .05
   membp         = .05
@@ -70,10 +70,10 @@ DERIVATIVE states {
   memb'  = (1e-3)*(A_M*cyt - (B_M + R_MP*kin_active)*memb + R_M*phos_active*membp)
   membp' = (1e-3)*(-R_M*phos_active*membp + R_MP*kin_active*memb)
 
+  kin_inactive = 1 - kin_active
+  phos_inactive = 1 - phos_active
   kin_active'    = (1e-3)*(-R_MP*memb*kin_active + kin_inactive*v_K - B_K*kin_active)
-  kin_inactive'  = (1e-3)*(B_K*kin_active - v_K*kin_inactive)
   phos_active'   = (1e-3)*(-R_M*membp*phos_active + phos_inactive*v_P - B_P*phos_active)
-  phos_inactive' = (1e-3)*(B_P*phos_active - v_P*phos_inactive)
 
   if (memb + membp > 0) {
     mkcc2i = (memb + membp)*1(mM)
