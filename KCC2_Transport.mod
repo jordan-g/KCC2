@@ -68,7 +68,7 @@ BREAKPOINT {
 KINETIC state {
   tonicgaba(v,ecl)
   transport_mm(cli, ki, mkcc2i)
-  driveforce(cli,clo, ki, ko)
+  driveforce(cli, clo, ki, ko)
   
   COMPARTMENT                PI*diam*diam/4 { cli }
   LONGITUDINAL_DIFFUSION axD*PI*diam*diam/4 { cli }

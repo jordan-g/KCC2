@@ -9,7 +9,10 @@ load_file("nrngui.hoc")
 //////////////////// model and interface scripts //////////////////////////////
 xopen("setParameters.hoc")
 xopen("makeCell.hoc")
-xopen("makeWindows.hoc")
+
+if (name_declared("record") == 0) {
+	xopen("makeWindows.hoc")
+}
 
 //////////////////// procedure definitions ////////////////////////////////////
 

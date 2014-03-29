@@ -10,16 +10,6 @@ diam = diameter
 L    = length
 Ra   = axial_res
 
-// Register ions with NEURON
-catype   = ion_register("ca", 2)
-cltype   = ion_register("cl", -1)
-hco3type = ion_register("hco3", -1)
-
-// Set styles for the ions
-castyle = ion_style("ca_ion", 3, 1, 0, 0, 1)
-clstyle = ion_style("cl_ion", 3, 2, 1, 1, 1)
-hco3style = ion_style("hco3_ion", 1, 2, 1, 0, 1)
-
 // Create vectors containing set mechanism control parameters
 objref distributed_mech_params
 distributed_mech_params = new Vector()
@@ -69,7 +59,7 @@ for i = 0, point_mech_params.size()-1 {
 
 // Insert pre-synaptic and post-synaptic stimuli
 objref stim_pre, stim_post, netcon_pre, netcon_post
-if (apply_stim_protocol == 1 && use_cclamp == 1 && use_gaba == 1) {
+if (apply_stim_protocol > 0 && use_cclamp == 1 && use_gaba == 1) {
 	stim_pre          = new NetStim(0.5)
 	stim_pre.interval = interval_pre
 	stim_pre.number   = number_pre
@@ -136,3 +126,17 @@ for i = 0, distributed_mech_params.size()-1 {
 		}
 	}
 }
+
+// Register ions with NEURON
+catype   = ion_register("ca", 2)
+cltype   = ion_register("cl", -1)
+hco3type = ion_register("hco3", -1)
+
+// Set styles for the ions
+castyle = ion_style("ca_ion", 3, 1, 0, 0, 1)
+clstyle = ion_style("cl_ion", 3, 2, 1, 1, 1)
+hco3style = ion_style("hco3_ion", 1, 2, 1, 0, 1)
+
+// Set chloride concentrations
+cli = cli0_cl_ion
+clo = clo0_cl_ion

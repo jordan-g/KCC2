@@ -2,55 +2,68 @@
 // recordData.hoc: This script is used to record data from simulations
 ///////////////////////////////////////////////////////////////////////////////
 
+xopen("setParameters.hoc")
+
 record = 1
 strdef experiment
-experiment = "1c"
+experiment = "2b"
 
 // Set simulation mechanism switches based on selected experiment
 if (strcmp(experiment, "1c") == 0) {
-    use_hh = 0
-    use_cclamp = 0
-    use_gaba = 0
-    use_ca_channels = 0
+    use_hh              = 0
+    use_cclamp          = 0
+    use_gaba            = 0
+    use_ca_channels     = 0
     apply_stim_protocol = 0
-    use_kcc2 = 0
-    use_kcc2_transport = 1
+    use_kcc2            = 0
+    use_kcc2_transport  = 1
 }
 if (strcmp(experiment, "2a") == 0) {
-    use_hh = 0
-    use_cclamp = 1
-    use_gaba = 1
-    use_ca_channels = 1
+    use_hh              = 1
+    use_cclamp          = 1
+    use_gaba            = 1
+    use_ca_channels     = 0
     apply_stim_protocol = 1
-    use_kcc2 = 1
-    use_kcc2_transport = 1
+    use_kcc2            = 0
+    use_kcc2_transport  = 0
+}
+if (strcmp(experiment, "2b") == 0) {
+    use_hh              = 1
+    use_cclamp          = 1
+    use_gaba            = 1
+    use_ca_channels     = 1
+    apply_stim_protocol = 1
+    use_kcc2            = 0
+    use_kcc2_transport  = 0
 }
 
-xopen("mosinit.hoc")
-
-rsamp = 2000                  // Sampling frequency for recording (in Hz)
-rstep = 1/(rsamp/1000)        // Time per sample
-nstep = tstop*(rsamp/1000)    // Number of samples per run
-
+// Define objects used in experiments
 strdef outdir, fname
 strdef filename
 objref runfile
+objref cli_vec, ecl_vec, v_vec, cai_vec
 
 // Run simulation according to selected experiment
-objref cli_vec, ecl_vec
+
+// 1c. cli and ecl vs. t for different mkcc2 values
 if (strcmp(experiment, "1c") == 0) {
-    // 1c. cli and ecl vs. t for different mkcc2 values
+    // Set simulation time parameters
+    rsamp = 2000                  // Sampling frequency for recording (in Hz)
+    rstep = 1/(rsamp/1000)        // Time per sample
+    nstep = tstop*(rsamp/1000)    // Number of samples per run
+
+    xopen("mosinit.hoc")
+
     outdir = "./data/1c"
     fname = "data"
-
     cli_vec = new Vector(nstep)
     ecl_vec = new Vector(nstep)
 
     // Create a File object
     runfile = new File()
 
-    for i = 1, 10 {
-        mkcc2_value = 0.05*i
+    for i = 0, 4 {
+        mkcc2_value = 0.05 + 0.1*i
 
         // Open the file for writing
         sprint(filename,"%s/%s_%.2f.dat", outdir, fname, mkcc2_value)
@@ -67,23 +80,91 @@ if (strcmp(experiment, "1c") == 0) {
         runfile.close()
     }
 }
+
+// 2a. voltage vs. t for some value of egaba, for pre-post and post-pre
 if (strcmp(experiment, "2a") == 0) {
-    // 2a. voltage vs. t for some value of egaba, for pre-post and post-pre
+    // Set simulation time parameters
+    rsamp = 2000                  // Sampling frequency for recording (in Hz)
+    rstep = 1/(rsamp/1000)        // Time per sample
+    nstep = tstop*(rsamp/1000)    // Number of samples per run
+
     outdir = "./data/2a"
     fname = "data"
-
     v_vec = new Vector(nstep)
+
+    // Pre-post ---------------
+    apply_stim_protocol = 1
+    xopen("mosinit.hoc")
 
     // Create a File object
     runfile = new File()
-
-    cli_value = 2
-
     // Open the file for writing
-    sprint(filename, "%s/%s_%.2f_pre-post.dat", outdir, fname, cli_value)
+    sprint(filename, "%s/%s_%.2f_pre-post.dat", outdir, fname, cli0_cl_ion)
     runfile.wopen(filename)
     v_vec.record(&v(0.5), rstep)
     init()
-    cli0_cl_ion = cli_value
     run()
+    v_vec.vwrite(runfile)
+    runfile.close()
+    // ------------------------
+
+    // Post-pre ---------------
+    apply_stim_protocol = 2
+    xopen("mosinit.hoc")
+
+    // Create a File object
+    runfile = new File()
+    // Open the file for writing
+    sprint(filename, "%s/%s_%.2f_post-pre.dat", outdir, fname, cli0_cl_ion)
+    runfile.wopen(filename)
+    v_vec.record(&v(0.5), rstep)
+    init()
+    run()
+    v_vec.vwrite(runfile)
+    runfile.close()
+    // ------------------------
+}
+
+// 2b. cai vs. t for some value of egaba, for pre-post and post-pre
+if (strcmp(experiment, "2b") == 0) {
+    // Set simulation time parameters
+    rsamp = 2000                  // Sampling frequency for recording (in Hz)
+    rstep = 1/(rsamp/1000)        // Time per sample
+    nstep = tstop*(rsamp/1000)    // Number of samples per run
+
+    outdir = "./data/2b"
+    fname = "data"
+    cai_vec = new Vector(nstep)
+
+    // Pre-post ---------------
+    apply_stim_protocol = 1
+    xopen("mosinit.hoc")
+
+    // Create a File object
+    runfile = new File()
+    // Open the file for writing
+    sprint(filename, "%s/%s_%.2f_pre-post.dat", outdir, fname, cli0_cl_ion)
+    runfile.wopen(filename)
+    cai_vec.record(&cai(0.5), rstep)
+    init()
+    run()
+    cai_vec.vwrite(runfile)
+    runfile.close()
+    // ------------------------
+
+    // Post-pre ---------------
+    apply_stim_protocol = 2
+    xopen("mosinit.hoc")
+
+    // Create a File object
+    runfile = new File()
+    // Open the file for writing
+    sprint(filename, "%s/%s_%.2f_post-pre.dat", outdir, fname, cli0_cl_ion)
+    runfile.wopen(filename)
+    cai_vec.record(&cai(0.5), rstep)
+    init()
+    run()
+    cai_vec.vwrite(runfile)
+    runfile.close()
+    // ------------------------
 }

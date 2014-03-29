@@ -1,0 +1,10 @@
+1b. transport vs. mkcc2 for different cli values
+1c. cli and ecl vs. t for different mkcc2 values
+2a. voltage vs. t for some value of egaba, for pre-post and post-pre
+2b. cai vs. t for some value of egaba, for pre-post and post-pre
+2c. cai integral vs. egaba, for pre-post and post-pre
+3a. active kinase and phosphotase vs. cai
+3b. heat map: steady state MP vs. active kinase & active phosphotase
+3c. heat map: steady state cli vs. active kinase & active phosphotase
+3d. heat map: steady state ecl vs. active kinase & active phosphotase
+3e. steady state ecl vs. cai integral, for pre-post and post-pre
