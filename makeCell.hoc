@@ -53,6 +53,8 @@ for i = 0, point_mech_params.size()-1 {
 			alpha_GABAa = gaba_alpha
 			beta_GABAa  = gaba_beta
 			gmax_GABAa  = gaba_gmax
+			cli = cli0_cl_ion
+			clo = clo0_cl_ion
 		}
 	}
 }
@@ -91,14 +93,19 @@ for i = 0, distributed_mech_params.size()-1 {
 		if (i == 1) {
 			dmt.select("cad")
 			dmt.make()
+			cainf_cad = cainf
+			cai = cai0_ca_ion
+			cao = cao0_ca_ion
 		}
 		if (i == 2) {
 			dmt.select("cal")
 			dmt.make()
+			gcalbar_cal = gcalbar
 		}
 		if (i == 3) {
 			dmt.select("cat2")
 			dmt.make()
+			gcatbar_cat2 = gcatbar
 		}
 		if (i == 4) {
 			dmt.select("KCC2")
@@ -115,6 +122,7 @@ for i = 0, distributed_mech_params.size()-1 {
 			H_P_KCC2  = H_P
 			B_K_KCC2  = B_K
 			B_P_KCC2  = B_P
+			mkcc2i0_mkcc2_ion = memb_KCC2 + membp_KCC2
 		}
 		if (i == 5) {
 			dmt.select("KCC2_Transport")
@@ -123,6 +131,8 @@ for i = 0, distributed_mech_params.size()-1 {
 			gtonic_KCC2_Transport = gtonic
 			R_T_KCC2_Transport    = R_T
 			r_T_KCC2_Transport    = r_T
+			cli = cli0_cl_ion
+			clo = clo0_cl_ion
 		}
 	}
 }
@@ -136,7 +146,3 @@ hco3type = ion_register("hco3", -1)
 castyle = ion_style("ca_ion", 3, 1, 0, 0, 1)
 clstyle = ion_style("cl_ion", 3, 2, 1, 1, 1)
 hco3style = ion_style("hco3_ion", 1, 2, 1, 0, 1)
-
-// Set chloride concentrations
-cli = cli0_cl_ion
-clo = clo0_cl_ion

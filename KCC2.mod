@@ -50,10 +50,10 @@ STATE {
 }
 
 INITIAL {
-  kin_active    = .7
-  kin_inactive  = .3
-  phos_active   = .7
-  phos_inactive = .3
+  kin_active    = .04
+  kin_inactive  = .96
+  phos_active   = .002
+  phos_inactive = .998
   cyt           = .9
   memb          = .05
   membp         = .05

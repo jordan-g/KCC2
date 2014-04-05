@@ -36,6 +36,15 @@ if (strcmp(experiment, "2b") == 0) {
     use_kcc2            = 0
     use_kcc2_transport  = 0
 }
+if (strcmp(experiment, "2c") == 0) {
+    use_hh              = 1
+    use_cclamp          = 1
+    use_gaba            = 1
+    use_ca_channels     = 1
+    apply_stim_protocol = 1
+    use_kcc2            = 1
+    use_kcc2_transport  = 1
+}
 
 // Define objects used in experiments
 strdef outdir, fname
@@ -133,6 +142,50 @@ if (strcmp(experiment, "2b") == 0) {
     nstep = tstop*(rsamp/1000)    // Number of samples per run
 
     outdir = "./data/2b"
+    fname = "data"
+    cai_vec = new Vector(nstep)
+
+    // Pre-post ---------------
+    apply_stim_protocol = 1
+    xopen("mosinit.hoc")
+
+    // Create a File object
+    runfile = new File()
+    // Open the file for writing
+    sprint(filename, "%s/%s_%.2f_pre-post.dat", outdir, fname, cli0_cl_ion)
+    runfile.wopen(filename)
+    cai_vec.record(&cai(0.5), rstep)
+    init()
+    run()
+    cai_vec.vwrite(runfile)
+    runfile.close()
+    // ------------------------
+
+    // Post-pre ---------------
+    apply_stim_protocol = 2
+    xopen("mosinit.hoc")
+
+    // Create a File object
+    runfile = new File()
+    // Open the file for writing
+    sprint(filename, "%s/%s_%.2f_post-pre.dat", outdir, fname, cli0_cl_ion)
+    runfile.wopen(filename)
+    cai_vec.record(&cai(0.5), rstep)
+    init()
+    run()
+    cai_vec.vwrite(runfile)
+    runfile.close()
+    // ------------------------
+}
+
+// 2c. cai integral vs. egaba, for pre-post and post-pre
+if (strcmp(experiment, "2c") == 0) {
+    // Set simulation time parameters
+    rsamp = 2000                  // Sampling frequency for recording (in Hz)
+    rstep = 1/(rsamp/1000)        // Time per sample
+    nstep = tstop*(rsamp/1000)    // Number of samples per run
+
+    outdir = "./data/2c"
     fname = "data"
     cai_vec = new Vector(nstep)
 

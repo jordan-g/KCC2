@@ -18,8 +18,10 @@ PARAMETER {
   dt              (ms)
   v               (mV)
   celsius = 34    (degC)
-  gcalbar = 1     (mho/cm2) : initialized conductance
+  gcalbar = 0     (mho/cm2) : initialized conductance
   ki      = 0.001 (mM)
+  cai     = 5.e-5 (mM)
+  cao     = 2     (mM)
   tfa     = 5               : time constant scaling factor
   eca     = 140             : Ca++ reversal potential
 }
@@ -35,8 +37,6 @@ STATE {	m }                      : unknown parameter to be solved in the DEs
 ASSIGNED {
   : parameters needed to solve DE
   ica  (mA/cm2)
-  cai  (mM)
-  cao  (mM)
   gcal (mho/cm2) 
   minf
   taum
@@ -113,6 +113,3 @@ PROCEDURE rates(v (mV)) {
   minf = a/(a+betm(v))       : estimation of activation steady state value
   facm = (1 - exp(-dt/(taum*1(ms))))
 }
-
-
-

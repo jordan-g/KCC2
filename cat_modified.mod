@@ -20,8 +20,10 @@ PARAMETER {
   v               (mV)
   tBase   = 23.5  (degC)
   celsius = 22    (degC)
-  gcatbar = 1     (mho/cm2)    : initialized conductance
+  gcatbar = 0     (mho/cm2)    : initialized conductance
   ki      = 0.001 (mM)
+  cai     = 5.e-5 (mM)
+  cao     = 2 (mM)
   tfa     = 1                  : activation time constant scaling factor
   tfi     = 0.68               : inactivation time constant scaling factor
   eca     = 140                : Ca++ reversal potential
@@ -38,8 +40,6 @@ STATE {	m h }  : unknown activation and inactivation parameters to be solved in 
 ASSIGNED {
   : parameters needed to solve DE
   ica  (mA/cm2)
-  cai  (mM)
-  cao  (mM)
   gcat (mho/cm2) 
   minf
   hinf

@@ -17,44 +17,44 @@ save_window.addexpr("V soma","v(.5)", 3, 1, 0.8, 0.9, 2)
 
 // Make the cli concentration plot
 save_window = new Graph(0)
-save_window.size(0,tstop,-100,40)
-save_window.view(0, -100, tstop, 140, 540, 0, 360, 360)
+save_window.size(0,tstop,0,20)
+save_window.view(0, 0, tstop, 20, 540, 0, 360, 360)
 graphList[0].append(save_window)
 save_window.save_name("graphList[0].")
 save_window.addexpr("cli soma","cli(.5)", 1, 1, 0.8, 0.9, 2)
 
-// Make the icl concentration plot
+// Make the cai plot
 save_window = new Graph(0)
-save_window.size(0,tstop,0,0.07)
-save_window.view(0, 0, tstop, 0.07, 920, 0, 360, 360)
+save_window.size(0,tstop,0,0.01)
+save_window.view(0, 0, tstop, 0.01, 920, 0, 360, 360)
 graphList[0].append(save_window)
 save_window.save_name("graphList[0].")
 save_window.addexpr("cai soma","cai(.5)", 1, 1, 0.8, 0.9, 2)
 
+// Make the kinase & phosphatase plot
+save_window = new Graph(0)
+save_window.size(0,tstop,0,0.7)
+save_window.view(0, 0, tstop, 0.7, 160, 360, 360, 360)
+graphList[0].append(save_window)
+save_window.save_name("graphList[0].")
+save_window.addexpr("active kinase","kin_active_KCC2(.5)", 2, 1, 0.8, 0.9, 2)
+save_window.addexpr("active phosphotase","phos_active_KCC2(.5)", 3, 1, 0.8, 0.9, 2)
+
 // Make the mkcc2i concentration plot
 save_window = new Graph(0)
-save_window.size(0,tstop,0,1)
-save_window.view(0, 0, tstop, 1, 540, 360, 360, 360)
+save_window.size(0,tstop,0,0.2)
+save_window.view(0, 0, tstop, 0.2, 540, 360, 360, 360)
 graphList[0].append(save_window)
 save_window.save_name("graphList[0].")
 save_window.addexpr("memb_KCC2 soma","mkcc2i(.5)", 1, 1, 0.8, 0.9, 2)
 
 // Make the ecl concentration plot
 save_window = new Graph(0)
-save_window.size(0,tstop,-100,40)
-save_window.view(0, -100, tstop, 140, 920, 360, 360, 360)
+save_window.size(0,tstop,-100,-20)
+save_window.view(0, -100, tstop, 80, 920, 360, 360, 360)
 graphList[0].append(save_window)
 save_window.save_name("graphList[0].")
 save_window.addexpr("ecl soma","ecl(.5)", 1, 1, 0.8, 0.9, 2)
-
-// Make the cai concentration plot
-save_window = new Graph(0)
-save_window.size(0,tstop,0,1)
-save_window.view(0, 0, tstop, 1, 160, 360, 360, 360)
-graphList[0].append(save_window)
-save_window.save_name("graphList[0].")
-save_window.addexpr("active kinase","kin_active_KCC2(.5)", 2, 1, 0.8, 0.9, 2)
-save_window.addexpr("active phosphotase","phos_active_KCC2(.5)", 3, 1, 0.8, 0.9, 2)
 
 // Make the RunControl panel
 xpanel("RunControl", 0)

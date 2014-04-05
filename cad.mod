@@ -56,7 +56,7 @@ UNITS {
 
 PARAMETER {
   depth = .1     (um)       : depth of shell
-  taur  = 20000  (ms)       : rate of calcium removal
+  taur  = 200    (ms)       : rate of calcium removal
   cainf = 100e-6 (mM)
   cai            (mM)
 }
@@ -83,6 +83,6 @@ DERIVATIVE state {
   if (drive_channel <= 0.) { drive_channel = 0.  }   : cannot pump inward 
 
   : ca' = drive_channel + (cainf-ca)/taur
-  ca' = drive_channel/18 + (cainf -ca)/taur*7
+  ca' = drive_channel/18 + (cainf - ca)/taur*7
   cai = ca
 }
