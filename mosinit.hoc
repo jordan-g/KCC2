@@ -10,6 +10,7 @@ load_file("nrngui.hoc")
 xopen("setParameters.hoc")
 xopen("makeCell.hoc")
 
+// Don't open windows if recording
 if (name_declared("record") == 0) {
 	xopen("makeWindows.hoc")
 }

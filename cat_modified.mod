@@ -23,7 +23,7 @@ PARAMETER {
   gcatbar = 0     (mho/cm2)    : initialized conductance
   ki      = 0.001 (mM)
   cai     = 5.e-5 (mM)
-  cao     = 2 (mM)
+  cao     = 2     (mM)
   tfa     = 1                  : activation time constant scaling factor
   tfi     = 0.68               : inactivation time constant scaling factor
   eca     = 140                : Ca++ reversal potential

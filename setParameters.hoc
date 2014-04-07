@@ -7,11 +7,11 @@ v_init            = -68   // mV
 tstop             = 90000 // ms
 dt                = 0.025 // ms
 celsius           = 25    // C degrees
-cli0_cl_ion       = 12    // mM
+cli0_cl_ion       = 8     // mM
 clo0_cl_ion       = 125   // mM
-hco3i0_hco3_ion   = 17.7  // mM
+hco3i0_hco3_ion   = 10    // mM
 hco3o0_hco3_ion   = 25    // mM
-cai0_ca_ion       = 10e-4 // mM
+cai0_ca_ion       = 4.5e-4// mM
 cao0_ca_ion       = 1.5   // mM
 
 // Soma parameters
@@ -50,7 +50,7 @@ gaba_gmax  = 0.001 // uS      (maximum synaptic conductance)
 
 // NetStim parameters
 interval_pre = 200  // ms
-number_pre   = 0
+number_pre   = 150
 noise_pre    = 0
 
 interval_post = 200 // ms
@@ -68,7 +68,7 @@ if (apply_stim_protocol == 2) {
 
 // KCC2 parameters
 A_M  = 1      // 1/s (rate of transfer from cytosolic to membrane-bound KCC2)
-B_M  = 18     // 1/s (rate of transfer from membrane-bound to cytosolic KCC2)
+B_M  = 20     // 1/s (rate of transfer from membrane-bound to cytosolic KCC2)
 R_M  = 2      // 1/s (KCC2 dephosphorylation coefficient)
 R_MP = 2      // 1/s (KCC2 phosphorylation coefficient)
 R_K  = 2e-2   // mM  (concentration of calcium at which kinase activation rate is at half max)

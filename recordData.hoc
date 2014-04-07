@@ -2,60 +2,44 @@
 // recordData.hoc: This script is used to record data from simulations
 ///////////////////////////////////////////////////////////////////////////////
 
-xopen("setParameters.hoc")
-
 record = 1
 strdef experiment
-experiment = "2b"
+experiment = "Variables vs. Time"
 
-// Set simulation mechanism switches based on selected experiment
-if (strcmp(experiment, "1c") == 0) {
-    use_hh              = 0
-    use_cclamp          = 0
-    use_gaba            = 0
-    use_ca_channels     = 0
-    apply_stim_protocol = 0
-    use_kcc2            = 0
-    use_kcc2_transport  = 1
-}
-if (strcmp(experiment, "2a") == 0) {
-    use_hh              = 1
-    use_cclamp          = 1
-    use_gaba            = 1
-    use_ca_channels     = 0
-    apply_stim_protocol = 1
-    use_kcc2            = 0
-    use_kcc2_transport  = 0
-}
-if (strcmp(experiment, "2b") == 0) {
-    use_hh              = 1
-    use_cclamp          = 1
-    use_gaba            = 1
-    use_ca_channels     = 1
-    apply_stim_protocol = 1
-    use_kcc2            = 0
-    use_kcc2_transport  = 0
-}
-if (strcmp(experiment, "2c") == 0) {
-    use_hh              = 1
-    use_cclamp          = 1
-    use_gaba            = 1
-    use_ca_channels     = 1
-    apply_stim_protocol = 1
-    use_kcc2            = 1
-    use_kcc2_transport  = 1
-}
+xopen("setParameters.hoc")
 
 // Define objects used in experiments
 strdef outdir, fname
 strdef filename
 objref runfile
-objref cli_vec, ecl_vec, v_vec, cai_vec
+objref cli_vec, ecl_vec, v_vec, kin_vec, phos_vec, mkcc2_vec, ehco3_vec, cai_vec
 
-// Run simulation according to selected experiment
+// Create a File object
+runfile = new File()
 
-// 1c. cli and ecl vs. t for different mkcc2 values
-if (strcmp(experiment, "1c") == 0) {
+// Helper functions -----------------------------------
+proc write_var_pre() {
+    // Open the file for writing
+    sprint(filename, "%s/%s_pre-post.dat", $s1, $s2)
+    runfile.wopen(filename)
+    $o3.vwrite(runfile)
+    runfile.close()
+}
+
+proc write_var_post() {
+    // Open the file for writing
+    sprint(filename, "%s/%s_post-pre.dat", $s1, $s2)
+    runfile.wopen(filename)
+    $o3.vwrite(runfile)
+    runfile.close()
+}
+
+// Recording functions --------------------------------
+
+// cli vs. t for varying mkcc2
+proc record_cli_vs_mkcc2() {
+    print "Recording Cl- vs. mKCC2"
+
     // Set simulation time parameters
     rsamp = 2000                  // Sampling frequency for recording (in Hz)
     rstep = 1/(rsamp/1000)        // Time per sample
@@ -63,9 +47,41 @@ if (strcmp(experiment, "1c") == 0) {
 
     xopen("mosinit.hoc")
 
-    outdir = "./data/1c"
-    fname = "data"
+    outdir = "./data"
+    fname = "cli_vs_mkcc2"
     cli_vec = new Vector(nstep)
+
+    for i = 0, 4 {
+        mkcc2_value = 0.05 + 0.1*i
+
+        // Open the file for writing
+        sprint(filename,"%s/%s_%.2f.dat", outdir, fname, mkcc2_value)
+        runfile.wopen(filename)
+        cli_vec.record(&cli(0.5), rstep)
+        init()
+        mkcc2i = mkcc2_value
+        run()
+        cli_vec.vwrite(runfile)
+
+        // Print the initial & final cli value for each value of mkcc2
+        print "mKCC2: ", mkcc2_value, "Initial Cl-: ", cli_vec.x[0], "Final Cl-: ", cli_vec.x[cli_vec.size()-1]
+        runfile.close()
+    }
+}
+
+// ecl vs. t for varying mkcc2
+proc record_ecl_vs_mkcc2() {
+    print "Recording ECl vs. mKCC2"
+
+    // Set simulation time parameters
+    rsamp = 2000                  // Sampling frequency for recording (in Hz)
+    rstep = 1/(rsamp/1000)        // Time per sample
+    nstep = tstop*(rsamp/1000)    // Number of samples per run
+
+    xopen("mosinit.hoc")
+
+    outdir = "./data"
+    fname = "ecl_vs_mkcc2"
     ecl_vec = new Vector(nstep)
 
     // Create a File object
@@ -77,147 +93,142 @@ if (strcmp(experiment, "1c") == 0) {
         // Open the file for writing
         sprint(filename,"%s/%s_%.2f.dat", outdir, fname, mkcc2_value)
         runfile.wopen(filename)
-        cli_vec.record(&cli(0.5), rstep)
         ecl_vec.record(&ecl(0.5), rstep)
         init()
         mkcc2i = mkcc2_value
         run()
-        cli_vec.vwrite(runfile)
         ecl_vec.vwrite(runfile)
-        // Print the final cli and ecl values for each value of mkcc2
-        print "mkcc2: ", mkcc2_value, "final cli: ", cli_vec.x[cli_vec.size()-1], " final ecl: ", ecl_vec.x[ecl_vec.size()-1]
+        // Print the initial & final ecl value for each value of mkcc2
+
+        print "mKCC2: ", mkcc2_value, "Initial ECl: ", ecl_vec.x[0], "Final ECl: ", ecl_vec.x[ecl_vec.size()-1]
         runfile.close()
     }
 }
 
-// 2a. voltage vs. t for some value of egaba, for pre-post and post-pre
-if (strcmp(experiment, "2a") == 0) {
+// variables vs. t for pre-post and post-pre
+proc record_variables() {
+    print "Recording Variables vs. Time"
+
     // Set simulation time parameters
-    rsamp = 2000                  // Sampling frequency for recording (in Hz)
+    rsamp = 8000                  // Sampling frequency for recording (in Hz)
     rstep = 1/(rsamp/1000)        // Time per sample
     nstep = tstop*(rsamp/1000)    // Number of samples per run
 
-    outdir = "./data/2a"
-    fname = "data"
+    outdir = "./data"
+    fname = "variables"
     v_vec = new Vector(nstep)
-
-    // Pre-post ---------------
-    apply_stim_protocol = 1
-    xopen("mosinit.hoc")
-
-    // Create a File object
-    runfile = new File()
-    // Open the file for writing
-    sprint(filename, "%s/%s_%.2f_pre-post.dat", outdir, fname, cli0_cl_ion)
-    runfile.wopen(filename)
-    v_vec.record(&v(0.5), rstep)
-    init()
-    run()
-    v_vec.vwrite(runfile)
-    runfile.close()
-    // ------------------------
-
-    // Post-pre ---------------
-    apply_stim_protocol = 2
-    xopen("mosinit.hoc")
-
-    // Create a File object
-    runfile = new File()
-    // Open the file for writing
-    sprint(filename, "%s/%s_%.2f_post-pre.dat", outdir, fname, cli0_cl_ion)
-    runfile.wopen(filename)
-    v_vec.record(&v(0.5), rstep)
-    init()
-    run()
-    v_vec.vwrite(runfile)
-    runfile.close()
-    // ------------------------
-}
-
-// 2b. cai vs. t for some value of egaba, for pre-post and post-pre
-if (strcmp(experiment, "2b") == 0) {
-    // Set simulation time parameters
-    rsamp = 2000                  // Sampling frequency for recording (in Hz)
-    rstep = 1/(rsamp/1000)        // Time per sample
-    nstep = tstop*(rsamp/1000)    // Number of samples per run
-
-    outdir = "./data/2b"
-    fname = "data"
+    kin_vec = new Vector(nstep)
+    phos_vec = new Vector(nstep)
+    mkcc2_vec = new Vector(nstep)
+    cli_vec = new Vector(nstep)
+    ecl_vec = new Vector(nstep)
+    ehco3_vec = new Vector(nstep)
     cai_vec = new Vector(nstep)
 
-    // Pre-post ---------------
+    // Create a File object
+    runfile = new File()
+
+    // Pre-post ----------------------------------------------
     apply_stim_protocol = 1
     xopen("mosinit.hoc")
 
-    // Create a File object
-    runfile = new File()
-    // Open the file for writing
-    sprint(filename, "%s/%s_%.2f_pre-post.dat", outdir, fname, cli0_cl_ion)
-    runfile.wopen(filename)
-    cai_vec.record(&cai(0.5), rstep)
     init()
-    run()
-    cai_vec.vwrite(runfile)
-    runfile.close()
-    // ------------------------
 
-    // Post-pre ---------------
+    v_vec.record(&v(0.5), rstep)
+    kin_vec.record(&kin_active_KCC2(0.5), rstep)
+    phos_vec.record(&phos_active_KCC2(0.5), rstep)
+    mkcc2_vec.record(&mkcc2i(0.5), rstep)
+    cli_vec.record(&cli(0.5), rstep)
+    ecl_vec.record(&ecl(0.5), rstep)
+    ehco3_vec.record(&ehco3(0.5), rstep)
+    cai_vec.record(&cai(0.5), rstep)
+
+    run()
+
+    write_var_pre(outdir, "voltage", v_vec)
+    write_var_pre(outdir, "kinase", kin_vec)
+    write_var_pre(outdir, "phosphatase", phos_vec)
+    write_var_pre(outdir, "mkcc2", mkcc2_vec)
+    write_var_pre(outdir, "cli", cli_vec)
+    write_var_pre(outdir, "ecl", ecl_vec)
+    write_var_pre(outdir, "ehco3", ehco3_vec)
+    write_var_pre(outdir, "cai", cai_vec)
+
+    print "Pre-post.\nInitial Voltage: ", v_vec.x[0], "Final Voltage: ", v_vec.x[nstep - 1]
+    print "Initial Active Kinase: ", kin_vec.x[0], "Final Active Kinase: ", kin_vec.x[nstep - 1]
+    print "Initial Active Phosphatase: ", phos_vec.x[0], "Final Active Phosphatase: ", phos_vec.x[nstep - 1]
+    print "Initial mKCC2: ", mkcc2_vec.x[0], "Final mKCC2: ", mkcc2_vec.x[nstep - 1]
+    print "Initial Cl-: ", cli_vec.x[0], "Final Cl-: ", cli_vec.x[nstep - 1]
+    print "Initial ECl: ", ecl_vec.x[0], "Final ECl: ", ecl_vec.x[nstep - 1]
+    print "Initial EHCO3: ", ehco3_vec.x[0], "Final EHCO3: ", ehco3_vec.x[nstep - 1]
+    print "Initial Ca2+: ", cai_vec.x[0], "Final Ca2+: ", cai_vec.x[nstep - 1]
+    // -------------------------------------------------------
+
+    // Post-pre ----------------------------------------------
     apply_stim_protocol = 2
     xopen("mosinit.hoc")
 
-    // Create a File object
-    runfile = new File()
-    // Open the file for writing
-    sprint(filename, "%s/%s_%.2f_post-pre.dat", outdir, fname, cli0_cl_ion)
-    runfile.wopen(filename)
-    cai_vec.record(&cai(0.5), rstep)
     init()
+
+    v_vec.record(&v(0.5), rstep)
+    kin_vec.record(&kin_active_KCC2(0.5), rstep)
+    phos_vec.record(&phos_active_KCC2(0.5), rstep)
+    mkcc2_vec.record(&mkcc2i(0.5), rstep)
+    cli_vec.record(&cli(0.5), rstep)
+    ecl_vec.record(&ecl(0.5), rstep)
+    ehco3_vec.record(&ehco3(0.5), rstep)
+    cai_vec.record(&cai(0.5), rstep)
+
     run()
-    cai_vec.vwrite(runfile)
-    runfile.close()
-    // ------------------------
+
+    write_var_post(outdir, "voltage", v_vec)
+    write_var_post(outdir, "kinase", kin_vec)
+    write_var_post(outdir, "phosphatase", phos_vec)
+    write_var_post(outdir, "mkcc2", mkcc2_vec)
+    write_var_post(outdir, "cli", cli_vec)
+    write_var_post(outdir, "ecl", ecl_vec)
+    write_var_post(outdir, "ehco3", ehco3_vec)
+    write_var_post(outdir, "cai", cai_vec)
+
+    print "Post-pre.\nInitial Voltage: ", v_vec.x[0], "Final Voltage: ", v_vec.x[nstep - 1]
+    print "Initial Active Kinase: ", kin_vec.x[0], "Final Active Kinase: ", kin_vec.x[nstep - 1]
+    print "Initial Active Phosphatase: ", phos_vec.x[0], "Final Active Phosphatase: ", phos_vec.x[nstep - 1]
+    print "Initial mKCC2: ", mkcc2_vec.x[0], "Final mKCC2: ", mkcc2_vec.x[nstep - 1]
+    print "Initial Cl-: ", cli_vec.x[0], "Final Cl-: ", cli_vec.x[nstep - 1]
+    print "Initial ECl: ", ecl_vec.x[0], "Final ECl: ", ecl_vec.x[nstep - 1]
+    print "Initial EHCO3: ", ehco3_vec.x[0], "Final EHCO3: ", ehco3_vec.x[nstep - 1]
+    print "Initial Ca2+: ", cai_vec.x[0], "Final Ca2+: ", cai_vec.x[nstep - 1]
+    // -------------------------------------------------------
 }
 
-// 2c. cai integral vs. egaba, for pre-post and post-pre
-if (strcmp(experiment, "2c") == 0) {
-    // Set simulation time parameters
-    rsamp = 2000                  // Sampling frequency for recording (in Hz)
-    rstep = 1/(rsamp/1000)        // Time per sample
-    nstep = tstop*(rsamp/1000)    // Number of samples per run
-
-    outdir = "./data/2c"
-    fname = "data"
-    cai_vec = new Vector(nstep)
-
-    // Pre-post ---------------
+// Set simulation mechanism switches & run recording based on selected experiment
+if (strcmp(experiment, "Cl- vs. mKCC2") == 0) {
+    use_hh              = 0
+    use_cclamp          = 0
+    use_gaba            = 0
+    use_ca_channels     = 0
+    apply_stim_protocol = 0
+    use_kcc2            = 0
+    use_kcc2_transport  = 1
+    record_cli_vs_mkcc2()
+}
+if (strcmp(experiment, "ECl vs. mKCC2") == 0) {
+    use_hh              = 0
+    use_cclamp          = 0
+    use_gaba            = 0
+    use_ca_channels     = 0
+    apply_stim_protocol = 0
+    use_kcc2            = 0
+    use_kcc2_transport  = 1
+    record_ecl_vs_mkcc2()
+}
+if (strcmp(experiment, "Variables vs. Time") == 0) {
+    use_hh              = 1
+    use_cclamp          = 1
+    use_gaba            = 1
+    use_ca_channels     = 1
     apply_stim_protocol = 1
-    xopen("mosinit.hoc")
-
-    // Create a File object
-    runfile = new File()
-    // Open the file for writing
-    sprint(filename, "%s/%s_%.2f_pre-post.dat", outdir, fname, cli0_cl_ion)
-    runfile.wopen(filename)
-    cai_vec.record(&cai(0.5), rstep)
-    init()
-    run()
-    cai_vec.vwrite(runfile)
-    runfile.close()
-    // ------------------------
-
-    // Post-pre ---------------
-    apply_stim_protocol = 2
-    xopen("mosinit.hoc")
-
-    // Create a File object
-    runfile = new File()
-    // Open the file for writing
-    sprint(filename, "%s/%s_%.2f_post-pre.dat", outdir, fname, cli0_cl_ion)
-    runfile.wopen(filename)
-    cai_vec.record(&cai(0.5), rstep)
-    init()
-    run()
-    cai_vec.vwrite(runfile)
-    runfile.close()
-    // ------------------------
+    use_kcc2            = 1
+    use_kcc2_transport  = 1
+    record_variables()
 }

@@ -55,6 +55,8 @@ for i = 0, point_mech_params.size()-1 {
 			gmax_GABAa  = gaba_gmax
 			cli = cli0_cl_ion
 			clo = clo0_cl_ion
+			hco3i = hco3i0_hco3_ion
+			hco3o = hco3o0_hco3_ion
 		}
 	}
 }
@@ -145,4 +147,4 @@ hco3type = ion_register("hco3", -1)
 // Set styles for the ions
 castyle = ion_style("ca_ion", 3, 1, 0, 0, 1)
 clstyle = ion_style("cl_ion", 3, 2, 1, 1, 1)
-hco3style = ion_style("hco3_ion", 1, 2, 1, 0, 1)
+hco3style = ion_style("hco3_ion", 3, 2, 1, 1, 1)

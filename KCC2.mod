@@ -50,13 +50,13 @@ STATE {
 }
 
 INITIAL {
-  kin_active    = .04
-  kin_inactive  = .96
-  phos_active   = .002
-  phos_inactive = .998
-  cyt           = .9
+  kin_active    = .00004
+  kin_inactive  = .99996
+  phos_active   = .00004
+  phos_inactive = .99996
+  cyt           = .891
   memb          = .05
-  membp         = .05
+  membp         = .059
 }
 
 BREAKPOINT {
@@ -70,8 +70,8 @@ DERIVATIVE states {
   memb'  = (1e-3)*(A_M*cyt - (B_M + R_MP*kin_active)*memb + R_M*phos_active*membp)
   membp' = (1e-3)*(-R_M*phos_active*membp + R_MP*kin_active*memb)
 
-  kin_inactive = 1 - kin_active
-  phos_inactive = 1 - phos_active
+  kin_inactive   = 1 - kin_active
+  phos_inactive  = 1 - phos_active
   kin_active'    = (1e-3)*(-R_MP*memb*kin_active + kin_inactive*v_K - B_K*kin_active)
   phos_active'   = (1e-3)*(-R_M*membp*phos_active + phos_inactive*v_P - B_P*phos_active)
 
